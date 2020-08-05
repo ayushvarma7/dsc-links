@@ -37,6 +37,6 @@ const server = app.listen(
 
 //Handling rejections
 process.on("unhandledRejection", (err, promise) => {
-  console.log(`Error: ${err.message}`.red);
+  console.log("Unhandled rejection at: ", promise, " reason: ", res);
   server.close(() => process.exit(1));
 });
