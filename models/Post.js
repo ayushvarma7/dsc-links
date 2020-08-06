@@ -22,6 +22,10 @@ const PostSchema = new mongoose.Schema({
     default: Date.now,
   },
   slug: String,
+  photo: {
+    type: String,
+    default: "none.jpg",
+  },
 });
 
 module.exports = mongoose.model("Post", PostSchema);
