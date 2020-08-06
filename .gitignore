@@ -1,4 +1,4 @@
 .cph
 node_modules/
-config.env
+/config.env/
 config/config.env
