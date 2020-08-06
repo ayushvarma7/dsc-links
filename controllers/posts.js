@@ -104,10 +104,7 @@ exports.createPost = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/posts/:id
 // @access  Private
 exports.updatePost = asyncHandler(async (req, res, next) => {
-  const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  let post = await Post.findById(req.params.id);
 
   if (!post) {
     return next(
@@ -115,6 +112,19 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
       404
     );
   }
+
+  //Correct User
+  if (post.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse("You are not authorized for updating this post"),
+      401
+    );
+  }
+
+  post = await Post.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
 
   res.status(200).json({ success: true, data: post });
 });
@@ -123,7 +133,7 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
 // @route   DELETE /api/v1/posts/:id
 // @access  Private
 exports.deletePost = asyncHandler(async (req, res, next) => {
-  const post = await Post.findByIdAndDelete(req.params.id);
+  const post = await Post.findById(req.params.id);
 
   if (!post) {
     return next(
@@ -132,6 +142,15 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
     );
   }
 
+  //Correct User
+  if (post.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse("You are not authorized for delete this post"),
+      401
+    );
+  }
+
+  post.remove();
   res.status(200).json({ success: true, data: {} });
 });
 
@@ -148,16 +167,18 @@ exports.uploadPhoto = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // console.log(req.files);
-
-  // console.log("this step works");
+  //Correct User
+  if (post.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse("You are not authorized for update this post"),
+      401
+    );
+  }
 
   if (!req.files) {
     return next(new ErrorResponse(`Please actually upload a file`, 400));
   }
-  // console.log("does this work?");
 
-  // console.log(req.files);
   const file = req.files.file;
 
   if (!file.mimetype.startsWith("image")) {
