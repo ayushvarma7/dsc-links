@@ -6,6 +6,7 @@ const colors = require("colors");
 const errorHandler = require("./middleware/error");
 const fileupload = require("express-fileupload");
 const path = require("path");
+const cookieParser = require("cookie-parser");
 
 //Loading config
 dotenv.config({ path: "./config/config.env" });
@@ -17,11 +18,14 @@ connectDB();
 const posts = require("./routes/posts");
 const auth = require("./routes/auth");
 
-
+//Actual express app
 const app = express();
 
 //Body parsing for Json
 app.use(express.json());
+
+//Cookie Parser
+app.use(cookieParser());
 
 //File uploader middleware
 app.use(fileupload());
@@ -37,7 +41,6 @@ app.use(express.static(path.join(__dirname, "public")));
 //Mount routers
 app.use("/api/v1/posts", posts);
 app.use("/api/v1/auth", auth);
-
 
 //Custom Error Handling Part
 app.use(errorHandler);
