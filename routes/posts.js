@@ -6,19 +6,19 @@ const {
   deletePost,
   updatePost,
   uploadPhoto,
+  getPostsCurrentUser,
 } = require("../controllers/posts");
 const { protect, authorize } = require("../middleware/auth");
 
 const router = express.Router();
 
 router
-  .route("/:id/photo")
-  .put(protect, authorize("user", "admin"), uploadPhoto);
+  .route("/me")
+  .get(protect, authorize("user", "admin"), getPostsCurrentUser);
 
 router
-  .route("/")
-  .get(getPosts)
-  .post(protect, authorize("user", "admin"), createPost);
+  .route("/:id/photo")
+  .put(protect, authorize("user", "admin"), uploadPhoto);
 
 router
   .route("/:id")
@@ -26,6 +26,9 @@ router
   .delete(protect, authorize("user", "admin"), deletePost)
   .put(protect, authorize("user", "admin"), updatePost);
 
-//TODO Add route to get all posts of the logged in user
+router
+  .route("/")
+  .get(getPosts)
+  .post(protect, authorize("user", "admin"), createPost);
 
 module.exports = router;

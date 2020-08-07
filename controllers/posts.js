@@ -86,6 +86,26 @@ exports.getPost = asyncHandler(async (req, res, next) => {
   res.status(200).json({ succes: true, data: post });
 });
 
+// @desc    Get all posts by current user
+// @route   GET /api/v1/posts/me/curr
+// @access  Private
+exports.getPostsCurrentUser = asyncHandler(async (req, res, next) => {
+  
+  const post = await Post.find({ user: req.user.id });
+  
+
+  if (!post) {
+    return next(
+      new ErrorResponse(`Post not found with id of ${req.params.id}`),
+      404
+    );
+  }
+
+  
+
+  res.status(200).json({ succes: true, data: post });
+});
+
 // @desc    Create a post
 // @route   POST /api/v1/posts/
 // @access  Private
