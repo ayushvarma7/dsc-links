@@ -7,6 +7,11 @@ const errorHandler = require("./middleware/error");
 const fileupload = require("express-fileupload");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
+const xss = require("xss-clean");
+const hpp = require("hpp");
+const cors = require("cors");
 
 //Loading config
 dotenv.config({ path: "./config/config.env" });
@@ -26,6 +31,19 @@ app.use(express.json());
 
 //Cookie Parser
 app.use(cookieParser());
+
+//Security stuff
+app.use(mongoSanitize());
+app.use(helmet());
+app.use(xss());
+app.use(hpp());
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 //File uploader middleware
 app.use(fileupload());
