@@ -92,7 +92,7 @@ exports.logout = asyncHandler(async (req, res, next) => {
 
   */
 
-  res.clearCookie("token");
+  res.clearCookie("auth-token");
 
   res.status(200).json({ success: true, data: {} });
 });
