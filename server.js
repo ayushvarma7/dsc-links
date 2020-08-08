@@ -22,6 +22,7 @@ connectDB();
 //Routing
 const posts = require("./routes/posts");
 const auth = require("./routes/auth");
+const clubs = require("./routes/clubs");
 
 //Actual express app
 const app = express();
@@ -59,6 +60,7 @@ app.use(express.static(path.join(__dirname, "public")));
 //Mount routers
 app.use("/api/v1/posts", posts);
 app.use("/api/v1/auth", auth);
+app.use("/api/v1/clubs", clubs);
 
 //Custom Error Handling Part
 app.use(errorHandler);
