@@ -4,7 +4,7 @@ const ErrorResponse = require("../utils/errorResponse");
 const path = require("path");
 
 // @desc    Get all Clubs
-// @route   GET /api/v1/posts
+// @route   GET /api/v1/clubs
 // @access  Public
 exports.getClubs = asyncHandler(async (req, res, next) => {
   let query;
@@ -90,7 +90,7 @@ exports.getClub = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/clubs/me/curr
 // @access  Private
 exports.getClubsCurrentUser = asyncHandler(async (req, res, next) => {
-  const club = await Vlub.find({ user: req.user.id });
+  const club = await Club.find({ user: req.user.id });
 
   if (!club) {
     return next(
@@ -99,7 +99,7 @@ exports.getClubsCurrentUser = asyncHandler(async (req, res, next) => {
     );
   }
 
-  res.status(200).json({ succes: true, data: post });
+  res.status(200).json({ succes: true, data: club });
 });
 
 // @desc    Create a Club
@@ -132,7 +132,7 @@ exports.updateClub = asyncHandler(async (req, res, next) => {
   //Correct User
   if (club.user.toString() !== req.user.id && req.user.role !== "admin") {
     return next(
-      new ErrorResponse("You are not authorized for updating this post"),
+      new ErrorResponse("You are not authorized for updating this club"),
       401
     );
   }
@@ -142,7 +142,7 @@ exports.updateClub = asyncHandler(async (req, res, next) => {
     runValidators: true,
   });
 
-  res.status(200).json({ success: true, data: post });
+  res.status(200).json({ success: true, data: club });
 });
 
 // @desc    Delete a club
@@ -161,7 +161,7 @@ exports.deleteClub = asyncHandler(async (req, res, next) => {
   //Correct User
   if (club.user.toString() !== req.user.id && req.user.role !== "admin") {
     return next(
-      new ErrorResponse("You are not authorized for delete this post"),
+      new ErrorResponse("You are not authorized for delete this club"),
       401
     );
   }
@@ -205,7 +205,7 @@ exports.uploadPhotoClub = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`Please upload a smaller size`, 400));
   }
 
-  file.name = `photo_club_${post._id}${path.parse(file.name).ext}`;
+  file.name = `photo_club_${club._id}${path.parse(file.name).ext}`;
 
   file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
     if (err) {
@@ -257,7 +257,7 @@ exports.uploadPhotoLeadClub = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`Please upload a smaller size`, 400));
   }
 
-  file.name = `photo_lead_club_${post._id}${path.parse(file.name).ext}`;
+  file.name = `photo_lead_club_${club._id}${path.parse(file.name).ext}`;
 
   file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
     if (err) {
@@ -273,3 +273,4 @@ exports.uploadPhotoLeadClub = asyncHandler(async (req, res, next) => {
     });
   });
 });
+
