@@ -243,9 +243,9 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Upload Photo for the Post
-// @route   PUT /api/v1/posts/:id/photo
+// @route   PUT /api/v1/posts/:id/photo/post
 // @access  Private
-exports.uploadPhoto = asyncHandler(async (req, res, next) => {
+exports.uploadPhotoPost = asyncHandler(async (req, res, next) => {
   const post = await Post.findById(req.params.id);
 
   if (!post) {
@@ -277,7 +277,59 @@ exports.uploadPhoto = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`Please upload a smaller size`, 400));
   }
 
-  file.name = `photo_${post._id}${path.parse(file.name).ext}`;
+  file.name = `photo_post_${post._id}${path.parse(file.name).ext}`;
+
+  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+    if (err) {
+      console.error(err);
+      return next(new ErrorResponse("File not uploaded", 500));
+    }
+
+    await Post.findByIdAndUpdate(req.params.id, { photo: file.name });
+
+    res.status(200).json({
+      success: true,
+      data: file.name,
+    });
+  });
+});
+
+// @desc    Upload Photo for the Post (Cover)
+// @route   PUT /api/v1/posts/:id/photo/cover
+// @access  Private
+exports.uploadPhotoCover = asyncHandler(async (req, res, next) => {
+  const post = await Post.findById(req.params.id);
+
+  if (!post) {
+    return next(
+      new ErrorResponse(`Post not found with id of ${req.params.id}`),
+      404
+    );
+  }
+
+  //Correct User
+  if (post.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse("You are not authorized for update this post"),
+      401
+    );
+  }
+
+  if (!req.files) {
+    return next(new ErrorResponse(`Please actually upload a file`, 400));
+  }
+
+  const file = req.files.file;
+
+  if (!file.mimetype.startsWith("image")) {
+    return next(new ErrorResponse(`That was not an image file`, 400));
+  }
+
+  if (file.size > process.env.MAX_FILE_UPLOAD) {
+    return next(new ErrorResponse(`Please upload a smaller size`, 400));
+  }
+
+  file.name = `photo_post_cover_${post._id}${path.parse(file.name).ext}`;
 
   file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
     if (err) {

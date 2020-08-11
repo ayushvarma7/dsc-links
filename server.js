@@ -62,7 +62,6 @@ app.use("/api/v1/posts", posts);
 app.use("/api/v1/clubs", clubs);
 app.use("/api/v1/auth", auth);
 
-
 //Custom Error Handling Part
 app.use(errorHandler);
 

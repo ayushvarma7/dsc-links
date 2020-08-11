@@ -222,7 +222,7 @@ exports.uploadPhotoClub = asyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc    Upload Club Photo
+// @desc    Upload Club Photo Lead
 // @route   PUT /api/v1/clubs/:id/photo_club/lead
 // @access  Private
 exports.uploadPhotoLeadClub = asyncHandler(async (req, res, next) => {
@@ -273,4 +273,3 @@ exports.uploadPhotoLeadClub = asyncHandler(async (req, res, next) => {
     });
   });
 });
-

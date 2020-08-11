@@ -5,8 +5,9 @@ const {
   createPost,
   deletePost,
   updatePost,
-  uploadPhoto,
+  uploadPhotoPost,
   getPostsCurrentUser,
+  uploadPhotoCover,
 } = require("../controllers/posts");
 const { protect, authorize } = require("../middleware/auth");
 
@@ -17,8 +18,12 @@ router
   .get(protect, authorize("user", "admin"), getPostsCurrentUser);
 
 router
-  .route("/:id/photo")
-  .put(protect, authorize("user", "admin"), uploadPhoto);
+  .route("/:id/photo/post")
+  .put(protect, authorize("user", "admin"), uploadPhotoPost);
+
+router
+  .route("/:id/photo/cover")
+  .put(protect, authorize("user", "admin"), uploadPhotoCover);
 
 router
   .route("/:id")
