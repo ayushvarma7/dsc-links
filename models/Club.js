@@ -4,6 +4,7 @@ const ClubSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Please add a name for your club"],
+    unique: true,
   },
   lead_name: {
     type: String,

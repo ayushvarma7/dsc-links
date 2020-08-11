@@ -2,6 +2,7 @@ const Club = require("../models/Club");
 const asyncHandler = require("../middleware/async");
 const ErrorResponse = require("../utils/errorResponse");
 const path = require("path");
+const Post = require("../models/Post");
 
 // @desc    Get all Clubs
 // @route   GET /api/v1/clubs
@@ -84,6 +85,21 @@ exports.getClub = asyncHandler(async (req, res, next) => {
   }
 
   res.status(200).json({ succes: true, data: club });
+});
+
+// @desc    All posts of the club
+// @route   GET /api/v1/club/:id
+// @access  Public
+exports.postsByClub = asyncHandler(async (req, res, next) => {
+  // console.log(req.params.id);
+  const clubPosts = await Post.find({ club_id: req.params.id }).sort(
+    "-createdAt"
+  );
+
+  res.status(201).json({
+    success: true,
+    data: clubPosts,
+  });
 });
 
 // @desc    Get all clubs by current user

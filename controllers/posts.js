@@ -2,6 +2,7 @@ const Post = require("../models/Post");
 const asyncHandler = require("../middleware/async");
 const ErrorResponse = require("../utils/errorResponse");
 const path = require("path");
+const Club = require("../models/Club");
 
 // @desc    Get all Posts
 // @route   GET /api/v1/posts
@@ -180,12 +181,31 @@ exports.createPost = asyncHandler(async (req, res, next) => {
   req.body.author_name = req.user.name;
   req.body.author_email = req.user.email;
 
-  const post = await Post.create(req.body);
+  let club_by_name = "";
+  const getClubId = async () => {
+    club_by_name = await Club.find({ name: req.body.club });
+    console.log("This is the  info of the club");
+    console.log(club_by_name[0]);
+  }
 
-  res.status(201).json({
-    success: true,
-    data: post,
-  });
+  const createPost = async () => {
+    console.log(club_by_name[0].id);
+    req.body.club_id = club_by_name[0].id;
+
+    const post = await Post.create(req.body);
+    res.status(201).json({
+      success: true,
+      data: post,
+    });
+
+  }
+
+  const list = [getClubId, createPost];
+  
+  for(const fn of list){
+    await fn();
+  }
+  
 });
 
 // @desc    Update a post

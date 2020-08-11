@@ -39,6 +39,10 @@ const PostSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  club_id: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Club",
+  },
 });
 
 module.exports = mongoose.model("Post", PostSchema);
