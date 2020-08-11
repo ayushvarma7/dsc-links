@@ -17,6 +17,14 @@ const PostSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please add content for your post."],
   },
+  author_name: {
+    type: String,
+    required: [true, "Author Name is required"],
+  },
+  author_email: {
+    type: String,
+    required: [true, "Author Email is required"],
+  },
   createdAt: {
     type: Date,
     default: Date.now,

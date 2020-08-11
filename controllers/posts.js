@@ -86,13 +86,10 @@ exports.getPost = asyncHandler(async (req, res, next) => {
   res.status(200).json({ succes: true, data: post });
 });
 
-// @desc    Get all posts by current user
-// @route   GET /api/v1/posts/me/curr
-// @access  Private
-exports.getPostsCurrentUser = asyncHandler(async (req, res, next) => {
-  
-  const post = await Post.find({ user: req.user.id });
-  
+/**
+ * 
+ *exports.getPost = asyncHandler(async (req, res, next) => {
+  const post = await Post.findById(req.params.id);
 
   if (!post) {
     return next(
@@ -101,9 +98,78 @@ exports.getPostsCurrentUser = asyncHandler(async (req, res, next) => {
     );
   }
 
-  
-
   res.status(200).json({ succes: true, data: post });
+});
+
+ * 
+ * 
+ */
+
+// @desc    Get all posts by current user
+// @route   GET /api/v1/posts/me/curr
+// @access  Private
+exports.getPostsCurrentUser = asyncHandler(async (req, res, next) => {
+  let query;
+
+  const reqQuery = { ...req.query };
+
+  const removeFields = ["select", "sort", "limit", "page"];
+
+  removeFields.forEach((param) => delete reqQuery[param]);
+
+  let queryStr = JSON.stringify(reqQuery);
+
+  queryStr = queryStr.replace(
+    /\b(gt|gte|lt|lte|in)\b/g,
+    (match) => `$${match}`
+  );
+
+  query = Post.find(JSON.parse(queryStr));
+
+  if (req.query.select) {
+    const fields = req.query.select.split(",").join(" ");
+    query = query.select(fields);
+  }
+
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    query = query.sort(sortBy);
+  } else {
+    query = query.sort("-createdAt");
+  }
+
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 15;
+
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+  const total = await Post.countDocuments();
+
+  query = query.skip(startIndex).limit(limit);
+
+  const post = await query;
+
+  const pagination = {};
+
+  if (endIndex < total) {
+    pagination.next = {
+      page: page + 1,
+      limit,
+    };
+  }
+  if (startIndex > 0) {
+    pagination.prev = {
+      page: page - 1,
+      limit,
+    };
+  }
+
+  res.status(200).json({
+    success: true,
+    count: post.length,
+    pagination: pagination,
+    data: post,
+  });
 });
 
 // @desc    Create a post
@@ -111,6 +177,8 @@ exports.getPostsCurrentUser = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.createPost = asyncHandler(async (req, res, next) => {
   req.body.user = req.user.id;
+  req.body.author_name = req.user.name;
+  req.body.author_email = req.user.email;
 
   const post = await Post.create(req.body);
 
