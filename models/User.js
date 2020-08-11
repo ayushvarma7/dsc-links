@@ -36,7 +36,7 @@ const UserSchema = new mongoose.Schema({
   clubs: {
     type: [String],
     required: [true, "Add the clubs you are a part of"],
-    default: ["none"],
+    default: [],
   },
 });
 
