@@ -3,6 +3,79 @@ const asyncHandler = require("../middleware/async");
 const ErrorResponse = require("../utils/errorResponse");
 const path = require("path");
 const Club = require("../models/Club");
+const multer = require("multer");
+
+// //STORAGE MULTER CONFIG
+// let storage = multer.diskStorage({
+//   destination: (req, res, cb) => {
+//     cb(null, `${process.env.FILE_UPLOAD_PATH}/`);
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, `${Date.now()}_${file.originalname}`);
+//   },
+//   fileFilter: (req, file, cb) => {
+//     const ext = path.extname(file.originalname);
+//     if (ext !== ".jpg" && ext !== ".png" && ext !== ".mp4") {
+//       return cb(res.status(400).end("only jpg, png, mp4 is allowed"), false);
+//     }
+//     cb(null, true);
+//   },
+// });
+
+// const upload = multer({ storage: storage }).single("file");
+
+exports.uploadFile = asyncHandler(async (req, res, next) => {
+
+  if (!req.files) {
+    return next(new ErrorResponse(`Please actually upload a file`, 400));
+  }
+
+  const file = req.files.file;
+
+  if (!file.mimetype.startsWith("image")) {
+    return next(new ErrorResponse(`That was not an image file`, 400));
+  }
+
+  if (file.size > process.env.MAX_FILE_UPLOAD) {
+    return next(new ErrorResponse(`Please upload a smaller size`, 400));
+  }
+
+  file.name = `${Date.now()}_photo_post_image_${path.parse(file.name).ext}`;
+
+  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+    if (err) {
+      console.error(err);
+      return next(new ErrorResponse("File not uploaded", 500));
+    }
+
+    // await Post.findByIdAndUpdate(req.params.id, { photo: file.name });
+
+    res.status(200).json({
+      success: true,
+      fileName: file.name,
+      url: `uploads/${file.name}`
+    });
+  });
+});
+
+/*
+
+upload(req, res, (err) => {
+    if (err) {
+      return res.json({ success: false, err });
+    }
+    console.log(req.files.file);
+    console.log("thisiisisisis");
+    console.log(res.req.files.file);
+    return res.json({
+      success: true,
+      url: "should be the url",
+      fileName: "should the filename"
+    });
+  });
+
+
+*/
 
 // @desc    Get all Posts
 // @route   GET /api/v1/posts
@@ -87,25 +160,6 @@ exports.getPost = asyncHandler(async (req, res, next) => {
   res.status(200).json({ succes: true, data: post });
 });
 
-/**
- * 
- *exports.getPost = asyncHandler(async (req, res, next) => {
-  const post = await Post.findById(req.params.id);
-
-  if (!post) {
-    return next(
-      new ErrorResponse(`Post not found with id of ${req.params.id}`),
-      404
-    );
-  }
-
-  res.status(200).json({ succes: true, data: post });
-});
-
- * 
- * 
- */
-
 // @desc    Get all posts by current user
 // @route   GET /api/v1/posts/me/curr
 // @access  Private
@@ -186,7 +240,7 @@ exports.createPost = asyncHandler(async (req, res, next) => {
     club_by_name = await Club.find({ name: req.body.club });
     console.log("This is the  info of the club");
     console.log(club_by_name[0]);
-  }
+  };
 
   const createPost = async () => {
     console.log(club_by_name[0].id);
@@ -197,15 +251,13 @@ exports.createPost = asyncHandler(async (req, res, next) => {
       success: true,
       data: post,
     });
-
-  }
+  };
 
   const list = [getClubId, createPost];
-  
-  for(const fn of list){
+
+  for (const fn of list) {
     await fn();
   }
-  
 });
 
 // @desc    Update a post

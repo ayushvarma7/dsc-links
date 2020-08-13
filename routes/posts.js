@@ -8,10 +8,15 @@ const {
   uploadPhotoPost,
   getPostsCurrentUser,
   uploadPhotoCover,
+  uploadFile,
 } = require("../controllers/posts");
 const { protect, authorize } = require("../middleware/auth");
 
 const router = express.Router();
+
+router
+  .route("/uploadfiles")
+  .post(protect, authorize("user", "admin"), uploadFile);
 
 router
   .route("/me")

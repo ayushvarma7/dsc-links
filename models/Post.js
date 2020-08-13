@@ -9,10 +9,10 @@ const PostSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please add a club name for your post."],
   },
-  description: {
-    type: String,
-    required: [true, "Please add a description for your post."],
-  },
+  // description: {
+  //   type: String,
+  //   required: [true, "Please add a description for your post."],
+  // },
   content: {
     type: String,
     required: [true, "Please add content for your post."],
