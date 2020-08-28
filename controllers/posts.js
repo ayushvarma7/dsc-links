@@ -4,6 +4,7 @@ const ErrorResponse = require("../utils/errorResponse");
 const path = require("path");
 const Club = require("../models/Club");
 const multer = require("multer");
+const he = require("he");
 
 // //STORAGE MULTER CONFIG
 // let storage = multer.diskStorage({
@@ -234,6 +235,7 @@ exports.createPost = asyncHandler(async (req, res, next) => {
   req.body.user = req.user.id;
   req.body.author_name = req.user.name;
   req.body.author_email = req.user.email;
+  req.body.content = he.decode(req.body.content);
 
   let club_by_name = "";
   const getClubId = async () => {
@@ -265,6 +267,8 @@ exports.createPost = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.updatePost = asyncHandler(async (req, res, next) => {
   let post = await Post.findById(req.params.id);
+
+  req.body.content = he.decode(req.body.content);
 
   if (!post) {
     return next(
