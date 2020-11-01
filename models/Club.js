@@ -47,6 +47,10 @@ const ClubSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  members: {
+    type: [],
+    default: []
+  }
 });
 
 module.exports = mongoose.model("Club", ClubSchema);
